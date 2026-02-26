@@ -2,8 +2,11 @@ use std::net::{SocketAddr, ToSocketAddrs};
 use stunclient::StunClient;
 use tokio::net::UdpSocket;
 use types::Peer;
+use uuid::Uuid;
 
 pub async fn get_ip_via_stun() -> Peer {
+    let peer_id = format!("Peer-{}", Uuid::new_v4());
+
     let local_addr: SocketAddr = "0.0.0.0:0".parse().unwrap();
     let stun_addr = "stun.l.google.com:19302"
         .to_socket_addrs()
@@ -17,5 +20,5 @@ pub async fn get_ip_via_stun() -> Peer {
     let f = c.query_external_address_async(&udp);
     let public_address = f.await.unwrap();
 
-    return Peer::new(public_address.ip(), public_address.port());
+    return Peer::new(peer_id, public_address.ip(), public_address.port());
 }
