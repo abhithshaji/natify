@@ -45,10 +45,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         dbg!(&peer_list);
     }
 
-   // peer 1 sends hole punch request to peer 2 ? HOW????
-    // but frist build a udp client server or whatever to sent data
-   // testing this would require 2 laps , 
-   // use tailscale to expose the registry server and run clients (peers) on 2 devices and try udp senfing of request from one peer to the other 
+   
   
 
     Ok(())

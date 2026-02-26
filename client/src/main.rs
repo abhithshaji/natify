@@ -1,5 +1,5 @@
 use std::io::{Read, Write};
-use std::net::{SocketAddr, TcpStream};
+use std::net::{SocketAddr, TcpStream, UdpSocket};
 use std::str::FromStr;
 use stun::get_ip_via_stun;
 use types::Peer;
@@ -23,7 +23,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tcp_stream.read(&mut buf)?;
     let peer_details: Peer = serde_json::from_str(str::from_utf8(&buf)?.trim_end_matches("\0"))?;
 
-    dbg!(peer_details);
+    // create a udp socket
+    let socket = UdpSocket::bind(format!("127.0.0.1:{}", self_details.port_no))?;
+
+    // send data to peer
+    socket.send_to(
+        "hole punch request".as_bytes(),
+        format!("127.0.0.1:{}", peer_details.port_no),
+    )?;
+    println!("hole punch request sent");
+
+    // receive data from peer
+    let mut received_message_buf: [u8; 1024] = [0; 1024];
+    socket.recv_from(&mut received_message_buf)?;
+
+    println!(
+        "Recieved Message : {:?}",
+        str::from_utf8(&received_message_buf)?.trim_end_matches("\0")
+    );
 
     Ok(())
 }
